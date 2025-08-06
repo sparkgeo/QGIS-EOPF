@@ -31,6 +31,7 @@
 #include <gdal.h>
 #include <cpl_minixml.h>
 #include "qgshelp.h"
+#include "qgsmessagelog.h"
 
 QgsGdalSourceSelect::QgsGdalSourceSelect( QWidget *parent, Qt::WindowFlags fl, QgsProviderRegistry::WidgetMode widgetMode )
   : QgsAbstractDataSourceWidget( parent, fl, widgetMode )
@@ -231,6 +232,12 @@ void QgsGdalSourceSelect::addButtonClicked()
     }
 
     sources << QgsProviderRegistry::instance()->encodeUri( QStringLiteral( "gdal" ), parts );
+    QString originalSourceLoggable( originalSource );
+    originalSourceLoggable.prepend("Original: ");
+    QgsMessageLog::logMessage( originalSource, "RasterLayerSource", Qgis::MessageLevel::Warning );
+    QString sourcesLoggable = sources.join(", ");
+    sourcesLoggable.prepend("Sources: ");
+    QgsMessageLog::logMessage( sourcesLoggable, "RasterLayerSource", Qgis::MessageLevel::Warning );
   }
 
   emit addRasterLayers( sources );
@@ -238,6 +245,9 @@ void QgsGdalSourceSelect::addButtonClicked()
 
 bool QgsGdalSourceSelect::configureFromUri( const QString &uri )
 {
+  QString uriLoggable( uri );
+  uriLoggable.prepend("URI: ")
+  QgsMessageLog::logMessage( uriLoggable, "RasterLayerSource", Qgis::MessageLevel::Warning );
   mDataSources.clear();
   mDataSources.append( uri );
   const QVariantMap decodedUri = QgsProviderRegistry::instance()->decodeUri( QStringLiteral( "gdal" ), uri );
