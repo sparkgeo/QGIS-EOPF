@@ -31,6 +31,7 @@
 #include <gdal.h>
 #include <cpl_minixml.h>
 #include "qgshelp.h"
+#include "qgsmessagelog.h"
 
 QgsGdalSourceSelect::QgsGdalSourceSelect( QWidget *parent, Qt::WindowFlags fl, QgsProviderRegistry::WidgetMode widgetMode )
   : QgsAbstractDataSourceWidget( parent, fl, widgetMode )
@@ -84,6 +85,7 @@ QgsGdalSourceSelect::QgsGdalSourceSelect( QWidget *parent, Qt::WindowFlags fl, Q
   mFileWidget->setStorageMode( QgsFileWidget::GetMultipleFiles );
   mFileWidget->setOptions( QFileDialog::HideNameFilterDetails );
   connect( mFileWidget, &QgsFileWidget::fileChanged, this, [this]( const QString &path ) {
+    // this line sets mRasterPath from user input in the dialog
     mRasterPath = mIsOgcApi ? QStringLiteral( "OGCAPI:%1" ).arg( path ) : path;
     emit enableButtons( !mRasterPath.isEmpty() );
     fillOpenOptions();
@@ -181,6 +183,10 @@ void QgsGdalSourceSelect::cmbProtocolTypes_currentIndexChanged( const QString &t
 
 void QgsGdalSourceSelect::addButtonClicked()
 {
+  QString rasterPathLoggable(mRasterPath);
+  rasterPathLoggable.prepend("Raster Path: ");
+  QgsMessageLog::logMessage( rasterPathLoggable, "RasterLayerSource", Qgis::MessageLevel::Warning );
+
   computeDataSources();
 
   if ( mDataSources.isEmpty() )
@@ -203,6 +209,10 @@ void QgsGdalSourceSelect::addButtonClicked()
   for ( const QString &originalSource : std::as_const( mDataSources ) )
   {
     QVariantMap parts = QgsProviderRegistry::instance()->decodeUri( QStringLiteral( "gdal" ), originalSource );
+
+    QString gdalPathLoggable( parts.value( QStringLiteral( "path" ), QString() ).toString() );
+    gdalPathLoggable.prepend("GDAL Path: ");
+    QgsMessageLog::logMessage( gdalPathLoggable, "RasterLayerSource", Qgis::MessageLevel::Warning );
 
     const QString vsiPrefix = parts.value( QStringLiteral( "vsiPrefix" ) ).toString();
     const QString scheme = QUrl( parts.value( QStringLiteral( "path" ) ).toString() ).scheme();
@@ -231,6 +241,12 @@ void QgsGdalSourceSelect::addButtonClicked()
     }
 
     sources << QgsProviderRegistry::instance()->encodeUri( QStringLiteral( "gdal" ), parts );
+    QString originalSourceLoggable( originalSource );
+    originalSourceLoggable.prepend("Original: ");
+    QgsMessageLog::logMessage( originalSourceLoggable, "RasterLayerSource", Qgis::MessageLevel::Warning );
+    QString sourcesLoggable = sources.join(", ");
+    sourcesLoggable.prepend("Sources: ");
+    QgsMessageLog::logMessage( sourcesLoggable, "RasterLayerSource", Qgis::MessageLevel::Warning );
   }
 
   emit addRasterLayers( sources );
@@ -238,9 +254,13 @@ void QgsGdalSourceSelect::addButtonClicked()
 
 bool QgsGdalSourceSelect::configureFromUri( const QString &uri )
 {
+  QString uriLoggable( uri );
+  uriLoggable.prepend("URI: ");
+  QgsMessageLog::logMessage( uriLoggable, "RasterLayerSource", Qgis::MessageLevel::Warning );
   mDataSources.clear();
   mDataSources.append( uri );
   const QVariantMap decodedUri = QgsProviderRegistry::instance()->decodeUri( QStringLiteral( "gdal" ), uri );
+
   const QString layerName { decodedUri.value( QStringLiteral( "layerName" ) ).toString() };
   mFileWidget->setFilePath( decodedUri.value( QStringLiteral( "path" ), QString() ).toString() );
   QVariantMap openOptions = decodedUri.value( QStringLiteral( "openOptions" ) ).toMap();
@@ -341,13 +361,22 @@ void QgsGdalSourceSelect::computeDataSources()
 
   if ( radioSrcFile->isChecked() || radioSrcOgcApi->isChecked() )
   {
+    QgsMessageLog::logMessage( "radioSrcFile checked", "RasterLayerSource", Qgis::MessageLevel::Warning );
     for ( const auto &filePath : QgsFileWidget::splitFilePaths( mRasterPath ) )
     {
+      QString filePathLoggable(filePath);
+      filePathLoggable.prepend("filePath: ");
+      QgsMessageLog::logMessage( filePathLoggable, "RasterLayerSource", Qgis::MessageLevel::Warning );
+
       QVariantMap parts;
       if ( !openOptions.isEmpty() )
         parts.insert( QStringLiteral( "openOptions" ), openOptions );
       parts.insert( QStringLiteral( "path" ), filePath );
-      mDataSources << QgsProviderRegistry::instance()->encodeUri( QStringLiteral( "gdal" ), parts );
+      QString encodedUri = QgsProviderRegistry::instance()->encodeUri( QStringLiteral( "gdal" ), parts );
+      QString encodedUriLoggable(encodedUri);
+      encodedUriLoggable.prepend("GDAL encoded URI: ");
+      QgsMessageLog::logMessage( encodedUriLoggable, "RasterLayerSource", Qgis::MessageLevel::Warning );
+      mDataSources << encodedUri;
     }
   }
   else if ( radioSrcProtocol->isChecked() )

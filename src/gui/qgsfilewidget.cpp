@@ -91,6 +91,10 @@ QStringList QgsFileWidget::splitFilePaths( const QString &path )
   for ( const QString &pathsPart : pathParts )
   {
     QString cleaned = pathsPart;
+    // This line removes all double quotes from paths. The second optional group
+    // in the cleanRe regex matches double quotes following by any number of
+    // whitespace characters (including 0). This is what prevents the ZARR: driver
+    // from correctly parsing a HTTP Zarr path.
     cleaned.remove( cleanRe );
     paths.append( cleaned );
   }
