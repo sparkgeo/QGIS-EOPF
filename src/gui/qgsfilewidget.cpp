@@ -86,7 +86,7 @@ QStringList QgsFileWidget::splitFilePaths( const QString &path )
   const thread_local QRegularExpression partsRegex = QRegularExpression( QStringLiteral( "\"\\s+\"" ) );
   const QStringList pathParts = path.split( partsRegex, Qt::SkipEmptyParts );
 
-  const thread_local QRegularExpression cleanRe( QStringLiteral( "(^\\s*\")|(\"\\s*)" ) );
+  const thread_local QRegularExpression cleanRe( QStringLiteral( "(^\\s*\")" ) );
   paths.reserve( pathParts.size() );
   for ( const QString &pathsPart : pathParts )
   {
