@@ -76,6 +76,18 @@ if [[ ${BUILD_WITH_QT6} = "ON" ]]; then
   )
 fi
 
+if [[ "${CMAKE_INSTALL_PREFIX}" != "" ]]; then
+  CMAKE_EXTRA_ARGS+=(
+    "-DCMAKE_INSTALL_PREFIX=$CMAKE_INSTALL_PREFIX"
+  )
+fi
+
+if [[ "${CMAKE_INSTALL_RPATH}" != "" ]]; then
+  CMAKE_EXTRA_ARGS+=(
+    "-DCMAKE_INSTALL_RPATH=$CMAKE_INSTALL_RPATH"
+  )
+fi
+
 cmake \
  -GNinja \
  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
@@ -117,7 +129,7 @@ cmake \
  -DORACLE_INCLUDEDIR=/instantclient_21_16/sdk/include/ \
  -DORACLE_LIBDIR=/instantclient_21_16/ \
  -DDISABLE_DEPRECATED=ON \
- -DPYTHON_TEST_WRAPPER="timeout -sSIGSEGV 55s" \
+ -DPYTHON_TEST_WRAPPER="timeout -sSIGSEGV ${PYTHON_TEST_TIMEOUT_S:-55}s" \
  -DCXX_EXTRA_FLAGS="${CLANG_WARNINGS}" \
  -DWERROR=TRUE \
  -DAGGRESSIVE_SAFE_MODE=ON \
