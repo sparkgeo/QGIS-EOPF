@@ -87,11 +87,13 @@ tests/testdata/cache/
 tests/testdata/checker360by180.asc.aux.xml
 tests/testdata/control_images/*/*.aux.xml
 tests/testdata/dPAOWM_styles.db
+tests/testdata/dwg/entities.gpkg
 tests/testdata/grass/wgs84/test/.gislock
 tests/testdata/grass/wgs84/test6/.gislock
 tests/testdata/grass/wgs84/test7/.gislock
 tests/testdata/landsat-int16-b1.tif.aux.xml
 tests/testdata/mGuhmd_styles.db
+tests/testdata/mesh/terrain_under_mesh.tif.aux.xml
 tests/testdata/mesh/trap_steady_05_3D.nc.aux.xml
 tests/testdata/oOQkbL_styles.db
 tests/testdata/point_clouds/las/cloud.copc.laz
