@@ -98,6 +98,17 @@ void QgsStacDataItemGuiProvider::populateContextMenu( QgsDataItem *item, QMenu *
       menu->addAction( actionDetails );
     }
   }
+
+  if ( QgsStacAssetItem *assetItem = qobject_cast<QgsStacAssetItem *>( item ) )
+  {
+    QAction *actionDownload = new QAction( tr( "Download Asset…" ), menu );
+    connect( actionDownload, &QAction::triggered, this, [assetItem, context] { downloadAssets( assetItem, context ); } );
+    menu->addAction( actionDownload );
+
+    QAction *actionDetails = new QAction( tr( "Details…" ), menu );
+    connect( actionDetails, &QAction::triggered, this, [assetItem] { showDetails( assetItem ); } );
+    menu->addAction( actionDetails );
+  }
 }
 
 void QgsStacDataItemGuiProvider::editConnection( QgsDataItem *item )
@@ -172,12 +183,20 @@ void QgsStacDataItemGuiProvider::showDetails( QgsDataItem *item )
   {
     obj = catalogItem->stacCatalog();
   }
-
   if ( obj )
   {
     QgsStacObjectDetailsDialog d;
-    d.setStacObject( obj );
+    d.setContentFromStacObject( obj );
     d.exec();
+    return;
+  }
+
+  if ( QgsStacAssetItem *assetItem = qobject_cast<QgsStacAssetItem *>( item ) )
+  {
+    QgsStacObjectDetailsDialog d;
+    d.setContentFromStacAsset( assetItem->stacAsset() );
+    d.exec();
+    return;
   }
 }
 

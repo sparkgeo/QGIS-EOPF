@@ -141,7 +141,7 @@ void QgsStacSourceSelect::onItemsViewScroll( int value )
 void QgsStacSourceSelect::onItemDoubleClicked( const QModelIndex &index )
 {
   QgsStacObjectDetailsDialog details( this );
-  details.setStacObject( index.data( QgsStacItemListModel::Role::StacObject ).value<QgsStacObject *>() );
+  details.setContentFromStacObject( index.data( QgsStacItemListModel::Role::StacObject ).value<QgsStacObject *>() );
   details.exec();
 }
 
@@ -566,7 +566,7 @@ void QgsStacSourceSelect::showItemsContextMenu( QPoint point )
   QAction *detailsAction = new QAction( tr( "Details…" ), menu );
   connect( detailsAction, &QAction::triggered, this, [this, index] {
     QgsStacObjectDetailsDialog details( this );
-    details.setStacObject( index.data( QgsStacItemListModel::Role::StacObject ).value<QgsStacObject *>() );
+    details.setContentFromStacObject( index.data( QgsStacItemListModel::Role::StacObject ).value<QgsStacObject *>() );
     details.exec();
   } );
 
