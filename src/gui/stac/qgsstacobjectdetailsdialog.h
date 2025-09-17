@@ -33,7 +33,7 @@ class QgsStacObjectDetailsDialog : public QDialog, private Ui::QgsStacObjectDeta
     explicit QgsStacObjectDetailsDialog( QWidget *parent = nullptr );
 
     void setContentFromStacObject( QgsStacObject *stacObject );
-    void setContentFromStacAsset ( const QgsStacAsset *stacAsset );
+    void setContentFromStacAsset ( const QString& assetId, const QgsStacAsset *stacAsset );
 
   private:
     void setContent ( QString bodyHtml, QString thumbnailHtml );

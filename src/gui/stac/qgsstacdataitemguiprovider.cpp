@@ -89,9 +89,21 @@ void QgsStacDataItemGuiProvider::populateContextMenu( QgsDataItem *item, QMenu *
     {
       menu->addSeparator();
 
-      QAction *actionDownload = new QAction( tr( "Download Assets…" ), menu );
-      connect( actionDownload, &QAction::triggered, this, [itemItem, context] { downloadAssets( itemItem, context ); } );
-      menu->addAction( actionDownload );
+      int downloadableAssets = 0;
+      const QMap<QString, QgsStacAsset> assets = itemItem->stacItem()->assets();
+      for ( auto it = assets.constBegin(); it != assets.constEnd(); ++it )
+      {
+        if ( it.value().isDownloadable() )
+        {
+          downloadableAssets += 1;
+        }
+      }
+      if ( downloadableAssets > 0 )
+      {
+        QAction *actionDownload = new QAction( tr( "Download Assets…" ), menu );
+        connect( actionDownload, &QAction::triggered, this, [itemItem, context] { downloadAssets( itemItem, context ); } );
+        menu->addAction( actionDownload );
+      }
 
       QAction *actionDetails = new QAction( tr( "Details…" ), menu );
       connect( actionDetails, &QAction::triggered, this, [itemItem] { showDetails( itemItem ); } );
@@ -101,9 +113,12 @@ void QgsStacDataItemGuiProvider::populateContextMenu( QgsDataItem *item, QMenu *
 
   if ( QgsStacAssetItem *assetItem = qobject_cast<QgsStacAssetItem *>( item ) )
   {
-    QAction *actionDownload = new QAction( tr( "Download Asset…" ), menu );
-    connect( actionDownload, &QAction::triggered, this, [assetItem, context] { downloadAssets( assetItem, context ); } );
-    menu->addAction( actionDownload );
+    if ( assetItem->stacAsset()->isDownloadable() )
+    {
+      QAction *actionDownload = new QAction( tr( "Download Asset…" ), menu );
+      connect( actionDownload, &QAction::triggered, this, [assetItem, context] { downloadAssets( assetItem, context ); } );
+      menu->addAction( actionDownload );
+    }
 
     QAction *actionDetails = new QAction( tr( "Details…" ), menu );
     connect( actionDetails, &QAction::triggered, this, [assetItem] { showDetails( assetItem ); } );
@@ -194,7 +209,7 @@ void QgsStacDataItemGuiProvider::showDetails( QgsDataItem *item )
   if ( QgsStacAssetItem *assetItem = qobject_cast<QgsStacAssetItem *>( item ) )
   {
     QgsStacObjectDetailsDialog d;
-    d.setContentFromStacAsset( assetItem->stacAsset() );
+    d.setContentFromStacAsset( assetItem->name(), assetItem->stacAsset() );
     d.exec();
     return;
   }
@@ -203,12 +218,21 @@ void QgsStacDataItemGuiProvider::showDetails( QgsDataItem *item )
 void QgsStacDataItemGuiProvider::downloadAssets( QgsDataItem *item, QgsDataItemGuiContext context )
 {
   QgsStacItemItem *itemItem = qobject_cast<QgsStacItemItem *>( item );
+  QgsStacAssetItem *assetItem = qobject_cast<QgsStacAssetItem *>( item );
 
-  if ( !itemItem )
+  if ( !( itemItem || assetItem ) )
     return;
 
   QgsStacDownloadAssetsDialog dialog;
-  dialog.setStacItem( itemItem->stacItem() );
+  if ( itemItem )
+  {
+    dialog.setStacItem( itemItem->stacItem() );
+  }
+  else if ( assetItem )
+  {
+    itemItem = qobject_cast<QgsStacItemItem *>( assetItem->parent() );
+    dialog.addStacAsset( assetItem->name(), assetItem->stacAsset() );
+  }
   dialog.setMessageBar( context.messageBar() );
   dialog.setAuthCfg( itemItem->stacController()->authCfg() );
   dialog.exec();
