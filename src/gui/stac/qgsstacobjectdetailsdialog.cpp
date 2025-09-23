@@ -54,7 +54,7 @@ void QgsStacObjectDetailsDialog::setContentFromStacObject( QgsStacObject *stacOb
 }
 
 
-void QgsStacObjectDetailsDialog::setContentFromStacAsset( const QString& assetId, const QgsStacAsset *stacAsset )
+void QgsStacObjectDetailsDialog::setContentFromStacAsset( const QString &assetId, const QgsStacAsset *stacAsset )
 {
   QString thumbnailHtml = QString( "" );
   if ( isThumbnailAsset( stacAsset ) )
@@ -82,12 +82,12 @@ void QgsStacObjectDetailsDialog::setContent( QString bodyHtml, QString thumbnail
   mWebView->setHtml( html );
 }
 
-bool QgsStacObjectDetailsDialog::isThumbnailAsset( const QgsStacAsset* stacAsset )
+bool QgsStacObjectDetailsDialog::isThumbnailAsset( const QgsStacAsset *stacAsset )
 {
   return stacAsset->roles().contains( QLatin1String( "thumbnail" ) );
 }
 
-QString QgsStacObjectDetailsDialog::thumbnailHtmlContent( const QgsStacAsset* stacAsset )
+QString QgsStacObjectDetailsDialog::thumbnailHtmlContent( const QgsStacAsset *stacAsset )
 {
   return QStringLiteral( "<img src=\"%1\" border=1><br>" ).arg( stacAsset->href() );
 }
