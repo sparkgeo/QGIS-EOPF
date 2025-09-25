@@ -35,17 +35,13 @@ class QgsStacObjectDetailsDialog : public QDialog, private Ui::QgsStacObjectDeta
     void setAuthcfg( const QString &authcfg );
 
     void setContentFromStacObject( QgsStacObject *stacObject );
-    void setContentFromStacAsset ( const QString& assetId, const QgsStacAsset *stacAsset );
+    void setContentFromStacAsset( const QString &assetId, const QgsStacAsset *stacAsset );
 
   private:
     QString mAuthcfg;
-    void setContentFromStacAsset ( const QgsStacAsset *stacAsset );
-
-  private:
-    QString mAuthcfg;
-    void setContent ( QString bodyHtml, QString thumbnailHtml );
-    bool isThumbnailAsset( const QgsStacAsset* stacAsset );
-    QString thumbnailHtmlContent( const QgsStacAsset* stacAsset );
+    void setContent( QString bodyHtml, QString thumbnailHtml );
+    bool isThumbnailAsset( const QgsStacAsset *stacAsset );
+    QString thumbnailHtmlContent( const QgsStacAsset *stacAsset );
 };
 
 ///@endcond

@@ -56,7 +56,7 @@ void QgsStacObjectDetailsDialog::setContentFromStacObject( QgsStacObject *stacOb
 }
 
 
-void QgsStacObjectDetailsDialog::setContentFromStacAsset( const QString& assetId, const QgsStacAsset *stacAsset )
+void QgsStacObjectDetailsDialog::setContentFromStacAsset( const QString &assetId, const QgsStacAsset *stacAsset )
 {
   QString thumbnailHtml = QString( "" );
   if ( isThumbnailAsset( stacAsset ) )
@@ -89,12 +89,12 @@ void QgsStacObjectDetailsDialog::setAuthcfg( const QString &authcfg )
   mAuthcfg = authcfg;
 }
 
-bool QgsStacObjectDetailsDialog::isThumbnailAsset( const QgsStacAsset* stacAsset )
+bool QgsStacObjectDetailsDialog::isThumbnailAsset( const QgsStacAsset *stacAsset )
 {
   return stacAsset->roles().contains( QLatin1String( "thumbnail" ) );
 }
 
-QString QgsStacObjectDetailsDialog::thumbnailHtmlContent( const QgsStacAsset* stacAsset )
+QString QgsStacObjectDetailsDialog::thumbnailHtmlContent( const QgsStacAsset *stacAsset )
 {
   QString uri = stacAsset->href();
   if ( !mAuthcfg.isEmpty() )
